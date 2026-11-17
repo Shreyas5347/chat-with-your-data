@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
+import documentRoutes from "./routes/documentRoutes.js";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("Chat With Your Data API is running!");
 });
+// Document routes
+app.use("/api/documents", documentRoutes);
 
 // Start server after database connection
 const startServer = async () => {
