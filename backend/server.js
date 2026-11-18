@@ -1,13 +1,15 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 
 import connectDB from "./config/db.js";
 import documentRoutes from "./routes/documentRoutes.js";
 
 import searchRoutes from "./routes/searchRoutes.js";
 
-dotenv.config();
+import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 
@@ -21,6 +23,7 @@ app.get("/", (req, res) => {
 // Document routes
 app.use("/api/documents", documentRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Start server after database connection
 const startServer = async () => {
