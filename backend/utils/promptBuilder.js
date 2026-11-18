@@ -2,16 +2,21 @@ const buildContext = (chunks) => {
 
     return chunks.map((chunk, index) => {
 
+        const sourceNumber = index + 1;
+
         return `
-[Source ${index + 1}]
+[Source ${sourceNumber}]
+
 Document Page: ${chunk.pageNumber ?? "Not available"}
+
 Chunk Index: ${chunk.chunkIndex}
 
 Content:
 ${chunk.text}
-        `;
 
-    }).join("\n\n");
+`;
+
+    }).join("\n--------------------\n");
 
 };
 
