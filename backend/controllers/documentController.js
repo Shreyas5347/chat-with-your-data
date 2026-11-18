@@ -9,6 +9,8 @@ import extractTXTText from "../services/textService.js";
 import cleanText from "../services/cleanTextService.js";
 import createChunks from "../services/chunkService.js";
 
+import generateEmbedding from "../services/embeddingService.js";
+
 export const uploadDocument = async (req, res) => {
 
     let document;
@@ -88,42 +90,76 @@ export const uploadDocument = async (req, res) => {
         });
 
         // Step 6: Prepare chunk records
-        const chunkDocuments = chunks.map(chunk => ({
+        // Step 6: Generate embeddings for each chunk
 
-            documentId: document._id,
+const chunkDocuments = [];
 
-            chunkIndex: chunk.chunkIndex,
+for (const chunk of chunks) {
 
-            text: chunk.text,
+    console.log(`Generating embedding for chunk ${chunk.chunkIndex + 1}/${chunks.length}`);
 
-            embedding: [],
+    const embedding = await generateEmbedding(
+        chunk.text,
+        file.originalname
+    );
+    
 
-            pageNumber: chunk.pageNumber
+    chunkDocuments.push({
 
-        }));
+        documentId: document._id,
 
-        // Step 7: Store chunks in MongoDB
-        await Chunk.insertMany(chunkDocuments);
+        chunkIndex: chunk.chunkIndex,
+
+        text: chunk.text,
+
+        embedding: embedding,
+
+        pageNumber: chunk.pageNumber
+
+    });
+
+}
+console.log("Total chunks:", chunkDocuments.length);
+
+console.log(
+    "First chunk embedding length:",
+    chunkDocuments[0]?.embedding?.length
+);
+
+console.log(
+    "First chunk embedding:",
+    chunkDocuments[0]?.embedding
+);
+
+// Step 7: Store chunks with embeddings
+await Chunk.insertMany(chunkDocuments);
+
+
+// Step 8: Update document status
+document.status = "completed";
+
+await document.save();
+
 
         res.status(201).json({
 
-            success: true,
+    success: true,
 
-            message: "Document extracted and chunked successfully. Embeddings are pending.",
+    message: "Document processed and embeddings generated successfully!",
 
-            document: {
+    document: {
 
-                id: document._id,
+        id: document._id,
 
-                filename: document.filename,
+        filename: document.filename,
 
-                totalChunks: document.totalChunks,
+        totalChunks: document.totalChunks,
 
-                status: document.status
+        status: document.status
 
-            }
+    }
 
-        });
+});
 
     } catch (error) {
 
