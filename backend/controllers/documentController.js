@@ -9,7 +9,7 @@ import extractTXTText from "../services/textService.js";
 import cleanText from "../services/cleanTextService.js";
 import createChunks from "../services/chunkService.js";
 
-import generateEmbedding from "../services/embeddingService.js";
+import { generateEmbedding } from "../services/embeddingService.js";
 
 export const uploadDocument = async (req, res) => {
 

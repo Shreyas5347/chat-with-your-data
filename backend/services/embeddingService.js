@@ -1,12 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
-const MODEL = process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-2";
+const MODEL =
+    process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-2";
 
 const DIMENSIONS = Number(
     process.env.EMBEDDING_DIMENSIONS || 768
 );
 
-// Initialize Gemini client
 const getGeminiClient = () => {
 
     if (!process.env.GEMINI_API_KEY) {
@@ -20,47 +20,62 @@ const getGeminiClient = () => {
 };
 
 
-// Generate embedding for one document chunk
-const generateEmbedding = async (text, filename) => {
+// Generate document embedding
+export const generateEmbedding = async (text, filename) => {
 
-    try {
+    const ai = getGeminiClient();
 
-        const ai = getGeminiClient();
+    const formattedText = `title: ${filename} | text: ${text}`;
 
-        // Format document according to Gemini's
-        // question-answering retrieval instructions
-        const formattedText = `title: ${filename} | text: ${text}`;
+    const response = await ai.models.embedContent({
 
-        const response = await ai.models.embedContent({
+        model: MODEL,
 
-            model: MODEL,
+        contents: formattedText,
 
-            contents: formattedText,
-
-            config: {
-                outputDimensionality: DIMENSIONS
-            }
-
-        });
-
-        const embedding = response.embeddings?.[0]?.values;
-
-        if (!embedding || embedding.length !== DIMENSIONS) {
-
-            throw new Error("Invalid embedding returned by Gemini.");
-
+        config: {
+            outputDimensionality: DIMENSIONS
         }
 
-        return embedding;
+    });
 
-    } catch (error) {
+    const embedding = response.embeddings?.[0]?.values;
 
-        console.error("Gemini Embedding Error:", error.message);
-
-        throw error;
-
+    if (!embedding || embedding.length !== DIMENSIONS) {
+        throw new Error("Invalid document embedding.");
     }
+
+    return embedding;
 
 };
 
-export default generateEmbedding;
+
+// Generate question embedding
+export const generateQueryEmbedding = async (question) => {
+
+    const ai = getGeminiClient();
+
+    const formattedQuestion =
+        `task: question answering | query: ${question}`;
+
+    const response = await ai.models.embedContent({
+
+        model: MODEL,
+
+        contents: formattedQuestion,
+
+        config: {
+            outputDimensionality: DIMENSIONS
+        }
+
+    });
+
+    const embedding = response.embeddings?.[0]?.values;
+
+    if (!embedding || embedding.length !== DIMENSIONS) {
+        throw new Error("Invalid question embedding.");
+    }
+
+    return embedding;
+
+};

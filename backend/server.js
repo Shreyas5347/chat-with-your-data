@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import documentRoutes from "./routes/documentRoutes.js";
 
+import searchRoutes from "./routes/searchRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -18,6 +20,7 @@ app.get("/", (req, res) => {
 });
 // Document routes
 app.use("/api/documents", documentRoutes);
+app.use("/api/search", searchRoutes);
 
 // Start server after database connection
 const startServer = async () => {
