@@ -11,7 +11,7 @@ import generateAnswer from "../services/llmService.js";
 import buildContext from "../utils/promptBuilder.js";
 
 const MIN_RELEVANCE_SCORE = Number(
-    process.env.MIN_RELEVANCE_SCORE || 0.80
+    process.env.MIN_RELEVANCE_SCORE || 0.75
 );
 
 export const chatWithDocument = async (req, res) => {
@@ -158,6 +158,37 @@ export const chatWithDocument = async (req, res) => {
             context
         );
 
+        const lowerAnswer = answer.toLowerCase();
+
+        const noAnswerKeywords = [
+            "does not contain",
+            "doesn't contain",
+            "do not contain",
+            "not found in the",
+            "not found in the uploaded",
+            "not mentioned in the",
+            "not mentioned in the uploaded",
+            "couldn't find relevant information",
+            "could not find relevant information",
+            "no information",
+            "information is not available",
+            "not provided in the",
+            "not established from the context",
+            "unable to find"
+        ];
+
+        const isNoAnswer = noAnswerKeywords.some(phrase => lowerAnswer.includes(phrase));
+
+        if (isNoAnswer) {
+            return res.status(200).json({
+                success: true,
+                question,
+                answer,
+                answerable: false,
+                sources: []
+            });
+        }
+
 
         // Step 11: Prepare citations
 
@@ -181,16 +212,19 @@ export const chatWithDocument = async (req, res) => {
         // Step 12: Return response
 
         res.status(200).json({
-
-            success: true,
-
-            question: question.trim(),
-
-            answer,
-
-            sources
-
-        });
+    success: true,
+    question,
+    answer,
+    answerable: true,
+    sources: relevantChunks.map((chunk, index) => ({
+        sourceNumber: index + 1,
+        chunkId: chunk._id,
+        chunkIndex: chunk.chunkIndex,
+        pageNumber: chunk.pageNumber,
+        score: chunk.score,
+        text: chunk.text
+    }))
+});
 
 
     }

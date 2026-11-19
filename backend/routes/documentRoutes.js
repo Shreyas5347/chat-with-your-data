@@ -4,10 +4,18 @@ import multer from "multer";
 import upload from "../middleware/uploadMiddleware.js";
 
 import {
+    getDocuments,
+    deleteDocument,
     uploadDocument
 } from "../controllers/documentController.js";
 
 const router = express.Router();
+
+// GET all documents
+router.get("/", getDocuments);
+
+// DELETE a document by ID
+router.delete("/:id", deleteDocument);
 
 router.post(
     "/upload",

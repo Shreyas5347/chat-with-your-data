@@ -11,6 +11,74 @@ import createChunks from "../services/chunkService.js";
 
 import { generateEmbedding } from "../services/embeddingService.js";
 
+// GET /api/documents — fetch all documents
+export const getDocuments = async (req, res) => {
+
+    try {
+
+        const documents = await Document.find()
+            .sort({ createdAt: -1 })
+            .select("_id filename fileType fileSize totalChunks status createdAt");
+
+        res.status(200).json({
+            success: true,
+            documents
+        });
+
+    } catch (error) {
+
+        console.error("Get Documents Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch documents.",
+            error: error.message
+        });
+
+    }
+
+};
+
+
+// DELETE /api/documents/:id — delete a document and its chunks
+export const deleteDocument = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        const document = await Document.findById(id);
+
+        if (!document) {
+            return res.status(404).json({
+                success: false,
+                message: "Document not found."
+            });
+        }
+
+        await Chunk.deleteMany({ documentId: id });
+        await Document.deleteOne({ _id: id });
+
+        res.status(200).json({
+            success: true,
+            message: "Document deleted successfully."
+        });
+
+    } catch (error) {
+
+        console.error("Delete Document Error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete document.",
+            error: error.message
+        });
+
+    }
+
+};
+
+
 export const uploadDocument = async (req, res) => {
 
     let document;
@@ -126,10 +194,7 @@ console.log(
     chunkDocuments[0]?.embedding?.length
 );
 
-console.log(
-    "First chunk embedding:",
-    chunkDocuments[0]?.embedding
-);
+
 
 // Step 7: Store chunks with embeddings
 await Chunk.insertMany(chunkDocuments);
@@ -149,9 +214,13 @@ await document.save();
 
     document: {
 
-        id: document._id,
+        _id: document._id,
 
         filename: document.filename,
+
+        fileSize: document.fileSize,
+
+        fileType: document.fileType,
 
         totalChunks: document.totalChunks,
 
