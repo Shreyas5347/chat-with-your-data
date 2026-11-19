@@ -179,8 +179,8 @@ if (
     return res.status(200).json({
         success: true,
         question,
-        answer: "I couldn't identify supporting sources in the uploaded document.",
-        answerable: false,
+        answer: result.answer,
+        answerable: true,
         sources: []
     });
 }

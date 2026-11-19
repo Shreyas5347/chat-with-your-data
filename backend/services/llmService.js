@@ -24,7 +24,9 @@ const generateAnswer = async (question, context) => {
 
             model: getModel(),
 
-             messages: [
+            response_format: { type: "json_object" },
+
+            messages: [
 
                 {
                     role: "system",
@@ -118,14 +120,38 @@ appropriate source citations.
 
         });
 
-        const answer =
+        const rawContent =
             completion.choices[0]?.message?.content;
 
-        if (!answer) {
+        if (!rawContent) {
             throw new Error("Groq returned an empty response.");
         }
 
-        return answer;
+        // Clean markdown code blocks if present
+        const cleaned = rawContent
+            .replace(/^```json\s*/i, "")
+            .replace(/^```\s*/i, "")
+            .replace(/```\s*$/i, "")
+            .trim();
+
+        let parsed;
+        try {
+            parsed = JSON.parse(cleaned);
+        } catch (err) {
+            console.error("Failed to parse LLM JSON response:", rawContent);
+            // Fallback object if parsing fails
+            parsed = {
+                answerable: true,
+                answer: rawContent,
+                usedSources: [1]
+            };
+        }
+
+        return {
+            answerable: Boolean(parsed.answerable),
+            answer: parsed.answer || rawContent,
+            usedSources: Array.isArray(parsed.usedSources) ? parsed.usedSources : []
+        };
 
     } catch (error) {
 
