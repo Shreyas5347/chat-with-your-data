@@ -35,6 +35,28 @@
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.3px;
+    flex: 1;
+}
+
+.theme-toggle-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+    flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-light);
 }
 
 /* Upload Button */

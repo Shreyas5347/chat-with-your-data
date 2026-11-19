@@ -1,4 +1,4 @@
-import { FileText, Upload, Trash2, CheckCircle, Loader } from "lucide-react";
+import { FileText, Upload, Trash2, CheckCircle, Loader, Sun, Moon } from "lucide-react";
 import "./Sidebar.css";
 
 function Sidebar({
@@ -8,6 +8,8 @@ function Sidebar({
     onUploadClick,
     onDocumentDeleted,
     loading,
+    theme,
+    onToggleTheme,
 }) {
     const formatFileSize = (bytes) => {
         if (!bytes) return "";
@@ -29,7 +31,15 @@ function Sidebar({
                 <div className="logo-icon">
                     <FileText size={20} />
                 </div>
-                <span className="logo-text">ChatWithDocs</span>
+                <span className="logo-text">Chat-With-Your-Data</span>
+                <button
+                    className="theme-toggle-btn"
+                    onClick={onToggleTheme}
+                    title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                    aria-label="Toggle theme"
+                >
+                    {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+                </button>
             </div>
 
             {/* Upload Button */}

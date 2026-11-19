@@ -6,10 +6,22 @@ import { getDocuments } from "./api/api";
 import "./App.css";
 
 function App() {
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem("theme") || "dark";
+    });
     const [documents, setDocuments] = useState([]);
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [showUpload, setShowUpload] = useState(false);
     const [loadingDocuments, setLoadingDocuments] = useState(true);
+
+    useEffect(() => {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    };
 
     // Fetch documents on mount
     useEffect(() => {
@@ -64,6 +76,8 @@ function App() {
                 onUploadClick={() => setShowUpload(true)}
                 onDocumentDeleted={handleDocumentDeleted}
                 loading={loadingDocuments}
+                theme={theme}
+                onToggleTheme={toggleTheme}
             />
 
             <main className="main-content">

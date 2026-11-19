@@ -39,6 +39,28 @@
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+[data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --bg-hover: #e2e8f0;
+    --bg-card: #ffffff;
+
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --accent-light: rgba(99, 102, 241, 0.12);
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+
+    --border: #e2e8f0;
+    --border-light: #cbd5e1;
+
+    --shadow: 0 4px 24px rgba(15, 23, 42, 0.08);
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
 html, body, #root {
     height: 100%;
     width: 100%;
