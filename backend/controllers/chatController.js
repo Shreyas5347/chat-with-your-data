@@ -149,81 +149,71 @@ export const chatWithDocument = async (req, res) => {
         const context = buildContext(relevantChunks);
 
 
-        // Step 10: Generate grounded answer
+        
 
-        console.log("Generating answer using Groq...");
+        // Step 10: Generate structured answer using Groq
 
-        const answer = await generateAnswer(
-            question.trim(),
-            context
-        );
+console.log("Generating answer using Groq...");
 
-        const lowerAnswer = answer.toLowerCase();
+const result = await generateAnswer(
+    question.trim(),
+    context
+);
 
-        const noAnswerKeywords = [
-            "does not contain",
-            "doesn't contain",
-            "do not contain",
-            "not found in the",
-            "not found in the uploaded",
-            "not mentioned in the",
-            "not mentioned in the uploaded",
-            "couldn't find relevant information",
-            "could not find relevant information",
-            "no information",
-            "information is not available",
-            "not provided in the",
-            "not established from the context",
-            "unable to find"
-        ];
+// Step 11: Handle unanswered questions
 
-        const isNoAnswer = noAnswerKeywords.some(phrase => lowerAnswer.includes(phrase));
+if (!result.answerable) {
+    return res.status(200).json({
+        success: true,
+        question,
+        answer: result.answer,
+        answerable: false,
+        sources: []
+    });
+}
+// Step 12: Select only sources used by the LLM
+if (
+    !Array.isArray(result.usedSources) ||
+    result.usedSources.length === 0
+) {
+    return res.status(200).json({
+        success: true,
+        question,
+        answer: "I couldn't identify supporting sources in the uploaded document.",
+        answerable: false,
+        sources: []
+    });
+}
+const citedSources = result.usedSources
+    .map(number => relevantChunks[number - 1])
+    .filter(Boolean);
 
-        if (isNoAnswer) {
-            return res.status(200).json({
-                success: true,
-                question,
-                answer,
-                answerable: false,
-                sources: []
-            });
-        }
+        // Step 13: Prepare citations
 
+        const sources = citedSources.map(chunk => {
+    const originalIndex = relevantChunks.indexOf(chunk);
 
-        // Step 11: Prepare citations
-
-        const sources = relevantChunks.map((chunk, index) => ({
-
-            sourceNumber: index + 1,
-
-            chunkId: chunk._id,
-
-            chunkIndex: chunk.chunkIndex,
-
-            pageNumber: chunk.pageNumber,
-
-            score: chunk.score,
-
-            text: chunk.text
-
-        }));
-
-
-        // Step 12: Return response
-
-        res.status(200).json({
-    success: true,
-    question,
-    answer,
-    answerable: true,
-    sources: relevantChunks.map((chunk, index) => ({
-        sourceNumber: index + 1,
+    return {
+        sourceNumber: originalIndex + 1,
         chunkId: chunk._id,
         chunkIndex: chunk.chunkIndex,
         pageNumber: chunk.pageNumber,
         score: chunk.score,
         text: chunk.text
-    }))
+    };
+});
+
+
+      
+
+       // Step 14: Return response
+
+return res.status(200).json({
+    success: true,
+    question,
+    answer: result.answer,
+    answerable: true,
+    sources
 });
 
 
