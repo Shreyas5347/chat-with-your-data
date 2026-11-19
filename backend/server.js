@@ -15,11 +15,13 @@ const app = express();
 
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://chat-with-your-data-six.vercel.app/"
+    "https://chat-with-your-data-six.vercel.app"
 ];
 
 app.use(cors({
-    origin: allowedOrigins
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 
