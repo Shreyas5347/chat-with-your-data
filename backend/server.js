@@ -13,7 +13,14 @@ import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://chat-with-your-data-87yu.onrender.com"
+];
+
+app.use(cors({
+    origin: allowedOrigins
+}));
 app.use(express.json());
 
 // Test route
