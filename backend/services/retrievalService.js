@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import Chunk from "../models/Chunk.js";
+import Chunk from "../models/chunk.js";
 
 const retrieveRelevantChunks = async (
     queryEmbedding,

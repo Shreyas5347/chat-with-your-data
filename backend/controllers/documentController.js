@@ -1,7 +1,7 @@
 import path from "path";
 
-import Document from "../models/Document.js";
-import Chunk from "../models/Chunk.js";
+import Document from "../models/document.js";
+import Chunk from "../models/chunk.js";
 
 import extractPDFText from "../services/pdfService.js";
 import extractTXTText from "../services/textService.js";

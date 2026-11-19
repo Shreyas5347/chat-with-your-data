@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import Document from "../models/Document.js";
+import Document from "../models/document.js";
 
 import { generateQueryEmbedding } from "../services/embeddingService.js";
 
